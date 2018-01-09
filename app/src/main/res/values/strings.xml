@@ -1,0 +1,33 @@
+<resources>
+    <string name="app_name">EventRegistry</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="this_app_will_crawl_the_internet_for_the_lastest_news_and_pin_point_the_location">This App will crawl the internet for the lastest news and pin point the location</string>
+    <string name="luaguage">Luaguage</string>
+    <string name="theme">Theme</string>
+    <string name="catorgory">Catorgory</string>
+    <string name="map">Map</string>
+    <string name="list_articles">List Articles</string>
+
+    <string-array name="Lauguages">
+        <item>English</item>
+        <item>Spanish</item>
+        <item>Germany</item>
+        <item>Crotian</item>
+    </string-array>
+
+    <string-array name="Theme">
+    <item>Dark</item>
+    <item>Light</item>
+
+        </string-array>
+
+    <string-array name="Cateogory">
+        <item>Everything</item>
+        <item>Business</item>
+        <item>Computers</item>
+        <item>Health</item>
+        <item>Science</item>
+        <item>Society</item>
+    </string-array>
+
+</resources>
