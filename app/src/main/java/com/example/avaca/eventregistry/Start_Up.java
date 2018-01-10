@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * Created by avaca on 1/7/2018.
  */
 
-public class Start_Up extends Activity {
+public class Start_Up extends Activity implements GetJSON.CallBack{
 
     Spinner LuaguageSpinner;
     Spinner ThemeSpinner;
@@ -56,31 +56,37 @@ public class Start_Up extends Activity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             progressbar.setProgress(0,true);
         }
-        Intent intent = new Intent(this,MapsActivity.class );
-
         UrlBuilder_EventRegistry url;
         if(Catorgory.getSelectedItem().equals("Everything")){
             Log.d("ButtonChangeSlide", "ChangeSlide: EVERYTHING TRUE-----------");
-//            url = new UrlBuilder_EventRegistry(LuaguageSpinner.getSelectedItem().toString());
             url = new UrlBuilder_EventRegistry("eng");
         }else{
             Log.d("ButtonChangeSlide", "ChangeSlide: NOT EVERTHING FALSE-----------" + Catorgory.getSelectedItem().toString());
-
-//            url = new UrlBuilder_EventRegistry(LuaguageSpinner.getSelectedItem().toString(),Catorgory.getSelectedItem().toString());
             url = new UrlBuilder_EventRegistry("eng",Catorgory.getSelectedItem().toString());
-
         }
         Log.d("ButtonChangeSlide", "ChangeSlide: " + url.getURL());
-        GetJSON json  = new GetJSON(url.getURL());
+        GetJSON json  = new GetJSON(url.getURL(),this);
+        Thread thread = new Thread(json);
+        thread.start();
+    }
 
-        intent.putParcelableArrayListExtra("JsonArray",json.Get_ListOfAritcles_withGeoCoords());
-
+    @Override
+    public void CallBack(ArrayList<DefaultNewsFormat> data) {
+        Intent intent = new Intent(this,MapsActivity.class );
+        intent.putParcelableArrayListExtra("JsonArray",data);
         if(ThemeSpinner.getSelectedItem().equals("Dark")){
             intent.putExtra("Theme",true);
         }else{
             intent.putExtra("Theme",false);
         }
         startActivity(intent);
+    }
+
+    public void ListNews(View view) {
+        Intent intent = new Intent(this,NewsList.class);
+        startActivity(intent);
+
+
     }
 }
 

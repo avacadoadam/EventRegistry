@@ -2,6 +2,7 @@ package com.example.avaca.eventregistry;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,20 +26,23 @@ import static android.content.ContentValues.TAG;
  * Created by avaca on 1/7/2018.
  */
 
-public class GetJSON{
+public class GetJSON implements Runnable{
 
+    interface CallBack{
+        public void CallBack(ArrayList<DefaultNewsFormat> data);
+    }
 
-   private ArrayList<DefaultNewsFormat> ListOfAritcles_withGeoCoords;
+    private ArrayList<DefaultNewsFormat> ListOfAritcles_withGeoCoords;
+    private String url;
+    private CallBack callback;
 
-    public GetJSON(String url){
-        try {
-            ListOfAritcles_withGeoCoords = Parse_Event_Registry(retreve(url));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    public GetJSON(String url,CallBack callBack){
+        this.url = url;
+        this.callback = callBack;
 
 
     }//End Of Constructor
+
 
 
     /**
@@ -48,7 +52,7 @@ public class GetJSON{
      * @throws IOException Will Throw if could Not Connect To Url
      * @throws JSONException Will Throw if JSON is not valid check for callback function
      */
-    public JSONObject retreve(String url_input) throws IOException, JSONException {
+    public static JSONObject retreve(String url_input) throws IOException, JSONException {
     URL url = new URL(url_input);
     URLConnection urlConn = url.openConnection();
     BufferedReader buffread = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
@@ -92,6 +96,17 @@ public class GetJSON{
 
 public ArrayList<DefaultNewsFormat> Get_ListOfAritcles_withGeoCoords(){
         return this.ListOfAritcles_withGeoCoords;
+}
+
+@Override
+public void run() {
+    try {
+        ListOfAritcles_withGeoCoords = Parse_Event_Registry(retreve(url));
+        callback.CallBack(ListOfAritcles_withGeoCoords);
+    }catch (Exception e){
+        e.printStackTrace();
+    }
+
 }
 }//End of GetJSON class
 
