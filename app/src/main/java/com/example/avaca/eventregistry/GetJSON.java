@@ -1,10 +1,10 @@
 package com.example.avaca.eventregistry;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
-import android.widget.ArrayAdapter;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.example.avaca.eventregistry.NewsFromat.BaseNews;
+import com.example.avaca.eventregistry.NewsFromat.NewsType;
+import com.example.avaca.eventregistry.NewsFromat.News_Geo;
+import com.example.avaca.eventregistry.NewsFromat.News_nonGeo;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,12 +14,10 @@ import org.json.JSONTokener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import static android.content.ContentValues.TAG;
 
 
 /**
@@ -29,10 +27,10 @@ import static android.content.ContentValues.TAG;
 public class GetJSON implements Runnable{
 
     interface CallBack{
-        public void CallBack(ArrayList<DefaultNewsFormat> data);
+        public void CallBack(ArrayList<BaseNews> data);
     }
 
-    private ArrayList<DefaultNewsFormat> ListOfAritcles_withGeoCoords;
+    private ArrayList<BaseNews> News;
     private String url;
     private CallBack callback;
 
@@ -42,9 +40,6 @@ public class GetJSON implements Runnable{
 
 
     }//End Of Constructor
-
-
-
     /**
      *
      * @param url_input the url Of the api query
@@ -69,119 +64,43 @@ public class GetJSON implements Runnable{
      * @throws JSONException ,Ariticles may Not contain GeoLocations in which case will
      * IGNORE and log when so
      */
-    public ArrayList<DefaultNewsFormat> Parse_Event_Registry(JSONObject json_obj) throws JSONException {
-        ArrayList<DefaultNewsFormat> ListOfAritcles_withGeoCoords = new ArrayList<DefaultNewsFormat>();
+    public ArrayList<BaseNews> Parse_Event_Registry(JSONObject json_obj) throws JSONException {
+        ArrayList<BaseNews> News = new ArrayList<BaseNews>();
         JSONObject articles = (JSONObject) json_obj.get("articles");
         JSONArray results = (JSONArray) articles.get("results");
         for (int i = 0; i < results.length(); i++) {
             try {
-                JSONObject location;
+                JSONObject ArticleResult;
                 if (!(results.getJSONObject(i).isNull("location"))) {
-                    location = results.getJSONObject(i).getJSONObject("location");
-                    DefaultNewsFormat news = new DefaultNewsFormat(location.getDouble("lat"),
-                            location.getDouble("long")
-                            , (String) results.getJSONObject(i).get("body"));
-                    ListOfAritcles_withGeoCoords.add(news);
+                    ArticleResult = results.getJSONObject(i).getJSONObject("location");
+                    News_Geo news = new News_Geo(results.getJSONObject(i).getString("body"),results.getJSONObject(i).getString("title"),NewsType.EventRegistry_Arictle_GeoCoords,ArticleResult.getDouble("lat"),ArticleResult.getDouble("long"));
+                    News.add(news);
                 }else{
+                    News_nonGeo news = new News_nonGeo(results.getJSONObject(i).getString("body"),results.getJSONObject(i).getString("title"), NewsType.EventRegistry_Arictle_NoGeoCoords);
+                    News.add(news);
                     Log.d("GetJson --", "Parse_Event_Registry:No locations " + i);
                 }
             } catch (Exception e) {
                 Log.d("NoGeoLocation", "GetJSON: Error in parsing JSON");
             }
         }//Close For loop
-        return ListOfAritcles_withGeoCoords;
+        return News;
     }//End of Class
 
 
 
-public ArrayList<DefaultNewsFormat> Get_ListOfAritcles_withGeoCoords(){
-        return this.ListOfAritcles_withGeoCoords;
+public ArrayList<BaseNews> Get_ListOfAritcles_withGeoCoords(){
+        return this.News;
 }
 
 @Override
 public void run() {
     try {
-        ListOfAritcles_withGeoCoords = Parse_Event_Registry(retreve(url));
-        callback.CallBack(ListOfAritcles_withGeoCoords);
+        News = Parse_Event_Registry(retreve(url));
+        callback.CallBack(News);
     }catch (Exception e){
         e.printStackTrace();
     }
 
 }
 }//End of GetJSON class
-
-//Abstract Class for news format
-abstract class NewsDataGeoCoords implements Parcelable{
-    private LatLng coords;
-    private String Body;
-    //Constructor
-    NewsDataGeoCoords(LatLng coords,String Body){
-        this.coords = coords;
-        this.Body = Body;
-    }
-    NewsDataGeoCoords(double lat,double lng,String Body){
-        this(new LatLng(lat,lng),Body);
-
-    }
-    //End of Construtors
-    //Getters and setters
-    public LatLng getCoords() {
-        return coords;
-    }
-
-    public void setCoords(LatLng coords) {
-        this.coords = coords;
-    }
-
-    public String getBody() {
-        return Body;
-    }
-
-    public void setBody(String body) {
-        Body = body;
-    }
-}//End Of NewsData Abstract Class
-
-class DefaultNewsFormat extends  NewsDataGeoCoords implements Parcelable{
-
-    DefaultNewsFormat(LatLng coords,String Body){
-        super(coords,Body);
-    }
-    DefaultNewsFormat(double lat,double lng,String Body){
-        super(lat,lng,Body);
-
-    }
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        //Can change to multiDemonsial Array
-
-        dest.writeDouble(getCoords().latitude);
-        dest.writeDouble(getCoords().longitude);
-        dest.writeString(getBody());
-    }
-
-    public static final Parcelable.Creator<DefaultNewsFormat> CREATOR
-            = new Parcelable.Creator<DefaultNewsFormat>(){
-        public DefaultNewsFormat createFromParcel(Parcel in){
-            return new DefaultNewsFormat(in);
-        }
-
-        @Override
-        public DefaultNewsFormat[] newArray(int size) {
-            return new DefaultNewsFormat[size];
-        }
-    };
-
-
-    public DefaultNewsFormat(Parcel in) {
-        super(in.readDouble(),in.readDouble(),in.readString());
-
-        Log.d(TAG, "DefaultNewsFormat: Parcel Constuctor Called");
-
-    }
-}

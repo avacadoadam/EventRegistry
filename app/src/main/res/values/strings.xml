@@ -7,6 +7,8 @@
     <string name="catorgory">Catorgory</string>
     <string name="map">Map</string>
     <string name="list_articles">List Articles</string>
+    <string name="GoBackButton">Goback</string>
+
 
     <string-array name="Lauguages">
         <item>English</item>

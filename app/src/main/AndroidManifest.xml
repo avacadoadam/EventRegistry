@@ -29,14 +29,6 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"
-            >
-
-
-
-        </activity>
-        <activity
             android:name=".Start_Up"
             android:label="StartUp">
             <intent-filter>
@@ -46,6 +38,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewsList" />
+        <activity android:name=".DisplayNewsFragmentPager">
+
+        </activity>
     </application>
 
 </manifest>

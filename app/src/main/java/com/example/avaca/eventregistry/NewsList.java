@@ -1,7 +1,7 @@
 package com.example.avaca.eventregistry;
 
 import android.app.Activity;
-import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -25,7 +24,7 @@ import java.util.ArrayList;
  * Created by avaca on 1/9/2018.
  */
 
-public class NewsList extends Activity implements GetJSON.CallBack{
+public class NewsList extends Activity{
     //Amount of articles change updated needed
     private ArrayList<String> NewsArrayTitle = new ArrayList<String>();
     private ArrayList<String> NewsArrayBody = new ArrayList<String>();
@@ -35,7 +34,7 @@ public class NewsList extends Activity implements GetJSON.CallBack{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.listnews);
+        setContentView(R.layout.listnewsxml);
         progressbar = (ProgressBar)findViewById(R.id.progressBar2);
         CatorgorySpinner =  (Spinner)findViewById(R.id.CatorgorySpinner_NewsList);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.Cateogory,android.R.layout.simple_spinner_dropdown_item);
@@ -87,7 +86,8 @@ public class NewsList extends Activity implements GetJSON.CallBack{
         e.printStackTrace();
     }
     }
-    
+
+
     public void NewSearch(View view) {
         if(!CatorgorySpinner.getSelectedItem().equals("Everything")){
             listview.setVisibility(View.INVISIBLE);
@@ -96,16 +96,13 @@ public class NewsList extends Activity implements GetJSON.CallBack{
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(200,200);
             progressbar.setLayoutParams(params);
             UrlBuilder_EventRegistry url = new UrlBuilder_EventRegistry("eng",CatorgorySpinner.getSelectedItem().toString());
-            GetJSON getjson = new GetJSON(url.getURL(),this);
-            Thread thread = new Thread(getjson);
+
+//            Thread thread = new Thread(getjson);
 
         }
 
 
     }
 
-    @Override
-    public void CallBack(ArrayList<DefaultNewsFormat> data) {
 
-    }
 }//End of NewsList Class

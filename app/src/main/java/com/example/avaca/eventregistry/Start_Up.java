@@ -13,6 +13,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
+import com.example.avaca.eventregistry.NewsFromat.BaseNews;
+
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -32,10 +34,10 @@ public class Start_Up extends Activity implements GetJSON.CallBack{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.start_up);
-        LuaguageSpinner = (Spinner)findViewById(R.id.LauguageSpinner);
-        ThemeSpinner = (Spinner)findViewById(R.id.Themespinner);
-        progressbar = (ProgressBar)findViewById(R.id.loader);
-        Catorgory = (Spinner)findViewById(R.id.CatorgorySpinner);
+        LuaguageSpinner = findViewById(R.id.LauguageSpinner);
+        ThemeSpinner = findViewById(R.id.Themespinner);
+        progressbar = findViewById(R.id.loader);
+        Catorgory = findViewById(R.id.CatorgorySpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.Lauguages,android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         LuaguageSpinner.setAdapter(adapter);
@@ -71,8 +73,8 @@ public class Start_Up extends Activity implements GetJSON.CallBack{
     }
 
     @Override
-    public void CallBack(ArrayList<DefaultNewsFormat> data) {
-        Intent intent = new Intent(this,MapsActivity.class );
+    public void CallBack(ArrayList<BaseNews> data) {
+        Intent intent = new Intent(this,DisplayNewsFragmentPager.class );
         intent.putParcelableArrayListExtra("JsonArray",data);
         if(ThemeSpinner.getSelectedItem().equals("Dark")){
             intent.putExtra("Theme",true);
@@ -83,8 +85,7 @@ public class Start_Up extends Activity implements GetJSON.CallBack{
     }
 
     public void ListNews(View view) {
-        Intent intent = new Intent(this,NewsList.class);
-        startActivity(intent);
+
 
 
     }
